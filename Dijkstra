@@ -1,0 +1,36 @@
+void solve()
+{
+    ll n,m; cin>>n>>m;
+    vector<pair<ll,ll>>adj[n+5];
+    
+    for(ll i=0;i<m;i++)
+    {
+        ll u,v,w; cin>>u>>v>>w;
+        adj[u].pb({v,w});
+    }
+    
+    ll dist[n];
+    for(ll i=1;i<=n;i++) dist[i]=inf;
+    dist[1]=0; // source
+    
+    set<pair<ll,ll>>s; //{dist, node}
+    // s will store all for blue nodes
+    
+    s.insert(0, 1) // default pink node
+    
+    while(s.size())
+    {
+        ll node=s.begin().S; // pink
+        s.erase(s.begin());
+        
+        for(auto &c : adj[node])
+        {
+            if(dist[c.F] > dist[node]+c.S)
+            {
+                s.erase({dist[c.F], c.F});
+                dist[c.F]=dist[node]+c.S;
+                s.insert({dist[c.F], c.F});
+            }
+        }
+    }
+}
