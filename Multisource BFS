@@ -1,0 +1,164 @@
+// problem : https://cses.fi/problemset/task/1194
+
+int dx[]={-1, +1, 0, 0};
+int dy[]={0, 0, -1, +1};
+// U D L R
+
+int main()
+{
+    int n,m; cin>>n>>m;
+    int si,sj;
+    vector<pair<int,int>>mons;
+
+    char grid[n+2][m+2];
+    for(int i=1;i<=n;i++)
+    {
+        for(int j=1;j<=m;j++)
+        {
+            cin>>grid[i][j];
+            if(grid[i][j]=='A')
+            {
+                si=i; sj=j;
+            }
+            if(grid[i][j]=='M') mons.pb({i,j});
+        }
+    }
+
+    // for monsters, multi source bfs
+
+    int vis[n+2][m+2];
+    for(int i=0;i<=n;i++)
+    {
+        for(int j=0;j<=m;j++) vis[i][j]=0;
+    }
+    int dist[n+2][m+2];
+    for(int i=0;i<=n;i++)
+    {
+        for(int j=0;j<=m;j++) dist[i][j]=INT_MAX;
+    }
+
+    queue<pair<int,int>>q;
+    for(auto i:mons)
+    {
+        q.push(i);
+        vis[i.first][i.second]=1;
+        dist[i.first][i.second]=0;
+    }
+
+    while(q.size())
+    {
+        int curX=q.front().first;
+        int curY=q.front().second;
+        q.pop();
+
+        for(int d=0;d<4;d++)
+        {
+            int X=curX+dx[d];
+            int Y=curY+dy[d];
+
+            if(X>=1 && Y>=1 && X<=n && Y<=m && vis[X][Y]==0 && grid[X][Y]!='#')
+            {
+                q.push({X,Y});
+                vis[X][Y]=1;
+                dist[X][Y]=dist[curX][curY]+1;
+            }
+        }
+    }
+
+    // for me, single source bfs
+
+    pair<int,int> par[n+2][m+2]; // for path recovering
+
+    int vis_a[n+2][m+2];
+    for(int i=0;i<=n;i++)
+    {
+        for(int j=0;j<=m;j++) vis_a[i][j]=0;
+    }
+    int dist_a[n+2][m+2];
+    for(int i=0;i<=n;i++)
+    {
+        for(int j=0;j<=m;j++) dist_a[i][j]=INT_MAX;
+    }
+
+    q.push({si,sj});
+    vis_a[si][sj]=1;
+    dist_a[si][sj]=0;
+
+    while(q.size())
+    {
+        int curX=q.front().first;
+        int curY=q.front().second;
+        q.pop();
+
+        for(int d=0;d<4;d++)
+        {
+            int X=curX+dx[d];
+            int Y=curY+dy[d];
+
+            if(X>=1 && Y>=1 && X<=n && Y<=m && vis_a[X][Y]==0 && grid[X][Y]!='#')
+            {
+                q.push({X,Y});
+                vis_a[X][Y]=1;
+                par[X][Y]={curX,curY};
+                dist_a[X][Y]=dist_a[curX][curY]+1;
+            }
+        }
+    }
+
+    int ei=-1, ej=-1;
+    for(int i=1;i<=m;i++)
+    {
+        if(dist_a[1][i]<dist[1][i])
+        {
+            ei=1; ej=i;
+        }
+        if(dist_a[n][i]<dist[n][i])
+        {
+            ei=n; ej=i;
+        }
+
+    }
+    for(int i=1;i<=n;i++)
+    {
+        if(dist_a[i][1]<dist[i][1])
+        {
+            ei=i; ej=1;
+        }
+        if(dist_a[i][m]<dist[i][m])
+        {
+            ei=i; ej=m;
+        }
+    }
+
+    if(ei==-1)
+    {
+        cout<<"NO";
+        return 0;
+    }
+    else
+    {
+        cout<<"YES"<<endl;
+
+        string res="";
+
+        while(1)
+        {
+            if(ei==si && ej==sj) break;
+
+            int cei, cej;
+            cei=par[ei][ej].first;
+            cej=par[ei][ej].second;
+
+            if(cei<ei) res+='D';
+            else if(cei>ei) res+='U';
+            else if(cej<ej) res+='R';
+            else res+='L';
+
+            ei=cei;
+            ej=cej;
+        }
+
+        cout<<res.size()<<endl;
+        for(int i=res.size()-1;i>=0;i--) cout<<res[i];
+    }
+}
