@@ -1,0 +1,161 @@
+
+/*
+Note:-single vertex is always strongly connected.
+Kosaraju algorithm:-
+step1:- Perform DFS traversal of graph push node to vector before returning.
+Step2:- Find transpose of a graph by reversing the edges.
+Step3:- Reverse the order vector.
+Step4:- Again do DFS traversal on reverse order vector and each successfull
+        DFS traversal give 1 Strongly Connected Component.
+*/
+
+vector<pair<ll,ll>>edge; /// input edges
+ 
+vector<ll>adj[100000]; /// original graph
+ 
+vector<ll>adjR[100000]; /// original graph ar reverse, SCC ber korte kaj lage
+ 
+vector<ll>adjN[100000]; /// akta SCC ar shob node ke new node a near por, oi new node
+                        /// gular jonno new akta adj list banante hobe
+ 
+stack<ll>st; /// SCC kuthay theke suru korbo bujar jonno node akane rakbo
+ 
+vector<ll>v; /// akta SCC te j nodes takbe ta akta dfs kore ai vector a rakbo
+ 
+map<ll,ll>mp; /// akta SCC ar shob node gula re akta new node a mark kore rakbo
+ 
+ll vis[100000];
+ll in_deg[100000];
+ll res[100000];
+ll a[100000];
+ 
+void dfsTimeOut(ll n)
+{
+    vis[n]=1;
+ 
+    for(auto i:adj[n])
+    {
+        if(vis[i]==0)
+        {
+            dfsTimeOut(i);
+        }
+    }
+ 
+    st.push(n);
+}
+ 
+void dfs(ll n)
+{
+    vis[n]=1;
+    v.pb(n);
+ 
+    for(auto i:adjR[n])
+    {
+        if(vis[i]==0)
+        {
+            dfs(i);
+        }
+    }
+}
+ 
+int main()
+{
+    ll n,m; cin>>n>>m;
+    for(ll i=0;i<n;i++) cin>>a[i];
+ 
+    for(ll i=0;i<m;i++)
+    {
+        ll a,b; cin>>a>>b;
+        a--; b--;
+        edge.pb({a,b});
+        adj[a].pb(b);
+        adjR[b].pb(a);
+        //mp[a]=a;
+        //mp[b]=b;
+    }
+ 
+    for(ll i=0;i<n;i++)
+    {
+        if(vis[i]==0)
+        {
+            dfsTimeOut(i);
+        }
+    }
+ 
+    mem(vis, 0);
+ 
+    ll new_node=0;
+ 
+    ll cost[n]; mem(cost, 0);
+ 
+    while(st.size())
+    {
+        ll i=st.top();
+        st.pop();
+ 
+        if(vis[i]==0)
+        {
+            v.clear();
+            dfs(i);
+ 
+            //if(v.size()==1) continue;
+ 
+            ll sum=0;
+            for(auto j:v)
+            {
+                sum+=a[j];
+                mp[j]=new_node;
+            }
+            cost[new_node]=sum;
+            new_node++;
+        }
+    }
+ 
+    mem(vis, 0);
+ 
+    for(auto i:edge)
+    {
+        ll u=i.F;
+        ll v=i.S;
+ 
+        if(mp[u]!=mp[v])
+        {
+            adjN[mp[u]].pb(mp[v]);
+            in_deg[mp[v]]++;
+        }
+    }
+ 
+    queue<pair<ll,ll>>q;
+ 
+    for(ll i=0;i<n;i++)
+    {
+        if(in_deg[i]==0)
+        {
+            q.push({i, cost[i]});
+        }
+    }
+ 
+    ll mx=-1;
+ 
+    while(q.size())
+    {
+        ll n=q.front().F;
+        ll val=q.front().S;
+ 
+        mx=max(mx, val);
+ 
+        q.pop();
+ 
+        for(auto i:adjN[n])
+        {
+            res[i]=max(res[i], val);
+            vis[i]=1;
+ 
+            in_deg[i]--;
+            if(in_deg[i]==0) q.push({i, res[i]+cost[i]});
+        }
+    }
+ 
+    cout<<mx<<endl;
+}
+
