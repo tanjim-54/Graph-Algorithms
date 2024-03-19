@@ -1,0 +1,22 @@
+ll n, m, cycle_found=0;
+ll vis[mx+5], samePath[mx+5];;
+
+void dfs(ll n)
+{
+    vis[n]=1;
+    samePath[n]=1;
+
+    for(auto i:adj[n])
+    {
+        if(vis[i]==0)
+        {
+            dfs(i);
+        }
+        else if(samePath[i]==1)
+        {
+            cycle_found=1;
+        }
+    }
+
+    samePath[n]=0;
+}
