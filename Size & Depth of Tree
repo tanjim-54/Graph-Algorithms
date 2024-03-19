@@ -1,0 +1,42 @@
+vector<ll>adj[100001];
+ll timein[100001],timeout[100001];
+ll vis[100001], siz[100001], depth[100001];
+ll t, n, ans=0;
+ 
+void size_calc(ll node)
+{
+    vis[node]=1;
+    timein[node]=t;
+    for(auto i:adj[node])
+    {
+        if(vis[i]==0)
+        {
+            vis[i]=1;
+            t++;
+            size_calc(i);
+        }
+    }
+    timeout[node]=t;
+}
+ 
+void depth_calc(ll node)
+{
+    vis[node]=1;
+    depth[node]+=1;
+    ll k=0;
+    for(auto i:adj[node])
+    {
+        if(vis[i]==0)
+        {
+            vis[i]=1;
+            depth_calc(i);
+            k=max(k,depth[i]);
+        }
+    }
+    depth[node]+=k;
+}
+
+for(ll i=1;i<=n;i++)
+{
+    siz[i]=timeout[i]-timein[i]+1;
+}
