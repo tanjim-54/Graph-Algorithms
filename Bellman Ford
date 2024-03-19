@@ -1,0 +1,60 @@
+struct info{
+    ll u, v, w;
+};
+
+const ll mx=1e3+123;
+vector<info>e;
+ll dist[mx];
+
+bool belmanFord(ll s, ll n, ll m)
+{
+    for(ll i=0;i<n;i++) dist[i]=infLL;
+    dist[s]=0;
+
+    bool isCycle=false;
+
+    for(ll i=1;i<=n;i++) 
+    {
+        isCycle=false;
+
+        for(ll j=0;j<m;j++) 
+        {
+            ll u=e[j].u;
+            ll v=e[j].v;
+            ll w=e[j].w;
+
+            if(dist[u]<infLL) 
+            {
+                if(dist[u]+w<dist[v]) 
+                {
+                    dist[v]=max(-infLL, dist[u]+w);
+                    isCycle=true;
+                }
+            }
+        }
+    }
+
+    return isCycle;
+}
+
+int main()
+{
+	ll t; cin>>t;
+	while(t--) 
+   	 {
+	       e.clear();
+	       ll n, m;
+	       cin>>n>>m;
+
+	        for(ll i=0;i<m;i++) 
+      	        {
+	               ll u, v, w;
+	               cin>>u>>v>>w;
+	               e.PB({u,v,w});
+	        }
+
+	        if(belmanFord (0, n,     m)==true) cout<<"possible";
+	        else cout<<"not possible";
+
+	   }
+}
